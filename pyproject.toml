@@ -1,0 +1,45 @@
+[project]
+name = "UETools"
+version = "2025.07.23"
+requires-python = ">=3.12"
+dynamic = ["dependencies"]
+readme = "README.md"
+license = "BSD-3-Clause-Clear"
+license-files = ["LICEN[CS]E*"]
+description = "Python tools for automating Unreal Engine workflows"
+
+dependencies = [
+    "typer ~=0.16.0",
+    "click >=8.2.1",
+    "rich >=10.11.0",
+    "click_shell ~=2.1",
+    "PyYAML >=6.0",
+    "typer_shell @ file:///home/scourtney/src/typer-shell.git/dist/typer_shell-0.2.0-py3-none-any.whl",
+]
+
+[project.urls]
+Homepage = "https://github.com/sna-scourtney/UETools"
+Issues = "https://github.com/sna-scourtney/UETools/issues"
+Documentation = "https://github.com/sna-scourtney/UETools/blob/main/docs/"
+
+[tool.poetry]
+#packages = [{include = "src/pyshell"}]
+
+[tool.poetry.dependencies]
+# All are currently in [project.dependencies].
+
+# Use 'poetry install --with python_console'
+# to support the interactive Python debug console.
+[tool.poetry.group.python_console.dependencies]
+#ipython = "*"
+
+[tool.poetry.group.typer_shell.dependencies]
+typer_shell = ">=0.2.0"
+
+#[tool.poetry.group.dev.dependencies]
+#ipdb = ">=0.13.13"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
