@@ -1,0 +1,98 @@
+%YAML 1.1
+
+---
+
+# Default settings for UETools. These are overridden by matching settings
+# in user- or site-specific configuration files.
+
+# TODO: Most or all of the global section will be in the framework refactor.
+global :
+  # Name of the tool as it appears in configuration or data filenames.
+  # This is recommended to be the package name in lowercase.
+  application : uetools
+
+  # Human-friendly name of the tool.
+  displayname : UETools
+
+  # Configuration file search settings that are permuted to generate
+  # filenames and directory paths to search. The application name is
+  # implicitly the base of each filename. Special characters in these
+  # options are intended to be interpreted by the operating system shell.
+  #
+  # For each list, the variants appear in order from lowest precedence
+  # (least preferred) to highest precedence (most preferred). The generated
+  # variants discovered later will override any matching settings from those
+  # found earlier. Non-overlapping settings are effectively merged in their
+  # effect on the application (but not literally in the files).
+  configfile :
+    # TODO: These will be inherited from the framework when it is integrated.
+    prefix :
+      - ''
+      - '.'
+    suffix :
+      - _default.yml
+      - _default.yaml
+      - .yml
+      - .yaml
+    # TODO: Possibly implement platform-specific subnodes.
+    path :
+      - '~'
+      - '~/.config'
+
+
+# TODO: Paths from the author's machine; replace with generic defaults.
+uetools :
+  paths :
+    engine:
+      # Locations for Unreal Engine. The term "engine" is used
+      # here to imply the combination of engine and editor.
+      installed:
+        # Parent directories under which downloaded binary
+        # versions of the Unreal Engine are found.
+        - /opt
+        - /usr/local
+      source:
+        # Parent directories under which UE source builds may
+        # be found.
+        - /usr/local/src
+    project:
+      # Parent directories under which UE project directoriees
+      # are found.
+      - ~/Documents/UnrealProjects
+      - ~/Projects/Unreal
+    vault:
+      # Vaults for assets and plugins downloaded from FAB etc.
+      # Multiple vaults may be specified, which can be useful if
+      # assets are being synced between multiple machines.
+      - /srv/ue_vault/linux
+      - /srv/ue_vault/windows
+      - /srv/ue_vault/mac
+    primary-vault:
+      # Optionally define a preferred vault which will be the
+      # default destination for imported or downloaded assets.
+      /srv/ue_vault/linux
+    config:
+      # Directory under which common and version-specific UE config
+      # files are found. This only needs to name the parent directory;
+      # the app will understand the structure under it.
+      ~/.config/Epic/UnrealEngine
+
+  build :
+    # These settings are defaults for building modules, projects,
+    # and plugins. Most can be overridden when invoking the build
+    # tools. Comment out those that are seldom used, to improve
+    # build times for project iteration.
+    platforms :
+      - linux
+      - android
+      # - windows
+    architectures :
+      - x64
+      - arm64
+    targets:
+      - editor
+      - game
+      # - server
+      # - client
+      # - program
+
