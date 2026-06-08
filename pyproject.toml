@@ -2,7 +2,6 @@
 name = "UETools"
 version = "2025.07.23"
 requires-python = ">=3.12"
-dynamic = ["dependencies"]
 readme = "README.md"
 license = "BSD-3-Clause-Clear"
 license-files = ["LICEN[CS]E*"]
@@ -23,24 +22,16 @@ Homepage = "https://github.com/sna-scourtney/UETools"
 Issues = "https://github.com/sna-scourtney/UETools/issues"
 Documentation = "https://github.com/sna-scourtney/UETools/blob/main/docs/"
 
-[tool.poetry]
-#packages = [{include = "src/pyshell"}]
+# Use 'uv sync --group python_console' to also install the interactive
+# Python debug console dependencies.
+[dependency-groups]
+python_console = []
+#python_console = ["ipython"]
+#dev = ["ipdb >=0.13.13"]
 
-[tool.poetry.dependencies]
-# All are currently in [project.dependencies].
-
-# Use 'poetry install --with python_console'
-# to support the interactive Python debug console.
-[tool.poetry.group.python_console.dependencies]
-#ipython = "*"
-
-[tool.poetry.group.typer_shell.dependencies]
-typer_shell = ">=0.2.0"
-
-#[tool.poetry.group.dev.dependencies]
-#ipdb = ">=0.13.13"
+[tool.hatch.build.targets.wheel]
+packages = ["src/UETools"]
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-
+requires = ["hatchling"]
+build-backend = "hatchling.build"
