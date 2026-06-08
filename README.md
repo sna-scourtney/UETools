@@ -10,6 +10,13 @@ Refer to the [documentation section](./docs/) for information about
 [notational conventions](./docs/Notation.md) and setting up a [development
 environment](./docs/Development.md).
 
+## Status Notice
+
+**This code is at proof-of-concept status** and is not yet complete. The repository is being
+made public to meet a commitment I made in a conference presentation, but "life happened" this
+week and I haven't got the new code pushed yet. It's coming Real Soon Now, but you probably
+don't want to clone this repo as it stands right now.
+
 ## Acknowledgments
 
 Author: Scott Courtney, Sine Nomine Associates
