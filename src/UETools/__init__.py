@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-__version__ = "2025.09.05"
+__version__ = "2026.06.27"
 
 import os
 
