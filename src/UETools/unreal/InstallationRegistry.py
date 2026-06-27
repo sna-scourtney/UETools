@@ -13,6 +13,12 @@ import platform
 from UETools.unreal.UnrealPlatform import UnrealPlatform, UEConfigSource
 from UETools.framework import path_search_subpath_list
 
+BUILD_VERSION_PATH: PurePath = PurePath("Engine") / "Build" / "Build.version"
+SAVED_CONFIG_PATH: PurePath  = PurePath("Saved") / "Config"
+ENGINE_BINARIES_PATH: PurePath = PurePath("Engine") / "Binaries"
+_DEFAULT_RECURSE_DEPTH: int = 3
+_INI_INSTALL_SECTION: str = "Installations"
+
 
 @dataclass(init=False)
 class EngineLocation:
@@ -44,14 +50,20 @@ class EngineLocation:
 
     @property
     def major(self) -> int:
+        if self.version is None:
+            return 0
         return int(self.version.split('.')[0])
 
     @property
     def minor(self) -> int:
+        if self.version is None:
+            return 0
         return int(self.version.split('.')[1])
 
     @property
     def patch(self) -> int:
+        if self.version is None:
+            return 0
         parts = self.version.split('.')
         return int(parts[2]) if len(parts) > 2 else 0
 
@@ -70,12 +82,6 @@ class EngineLocation:
             return f"{data['MajorVersion']}.{data['MinorVersion']}.{data['PatchVersion']}"
         except (KeyError, json.JSONDecodeError, OSError):
             return None
-
-
-BUILD_VERSION_PATH: PurePath = PurePath("Engine") / "Build" / "Build.version"
-SAVED_CONFIG_PATH: PurePath  = PurePath("Saved") / "Config"
-ENGINE_BINARIES_PATH: PurePath = PurePath("Engine") / "Binaries"
-_DEFAULT_RECURSE_DEPTH: int = 3
 
 class InstallationRegistry(ABC):
     """
@@ -232,11 +238,14 @@ class InstallationRegistry_Linux(InstallationRegistry):
         parser.read(registry_path)
 
         locations: list[EngineLocation] = []
-        for key, value in parser["Installations"].items():
+        if not parser.has_section(_INI_INSTALL_SECTION):
+            # Missing config section; leave the list empty
+            return locations
+        for key, value in parser[_INI_INSTALL_SECTION].items():
             root = Path(value.strip())
             if key.startswith('{'):
                 # GUID key: source build registered without a version string.
-                version = self.version_from_root(root)
+                version = EngineLocation.version_from_root(root)
                 if version is None:
                     continue
             else:

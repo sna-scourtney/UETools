@@ -157,7 +157,6 @@ class AppContext(object):
         package_path = Path(__file__).parent
         config_path = package_path / 'default.yaml'
         return config_path
-        return None
 
     def __enter__(self):
         return self
