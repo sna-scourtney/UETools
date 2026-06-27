@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import rich
+console = rich.get_console()
+
 from pathlib import Path
 
 from UETools.unreal.UnrealPlatform import UEConfigSource
