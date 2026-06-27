@@ -17,7 +17,7 @@ See the [main README](../README.md) for more information.
 
 from typing import Optional, Annotated, Any
 from types import SimpleNamespace
-from pathlib import Path
+from pathlib import Path, PurePath
 from collections import ChainMap
 from contextlib import contextmanager
 from itertools import chain
@@ -29,6 +29,51 @@ from yamlpath import Processor
 from yamlpath import YAMLPath
 import logging
 import os
+
+### Utility Functions ###
+
+def path_search_subpath(path: Path, subpath: PurePath, found_dirs: list[Path], *, max_depth: int = 3, depth: int = 1):
+    """
+    Find a subpath with one or more directory levels beneath the specified starting point, recursing
+    to the specified maximum depth. The matching paths are appended to found_dirs.
+
+    The Path.walk() function would have been a simpler approach, but it lacks the ability to limit
+    recursion depth, which is important for this application because of the extremely deep path trees.
+
+    :param path: parent Path under which search will be conducted
+    :param subpath: a subpath whose existence under a search point indicates the parent is  match
+    :param found_dirs: list of Path objects to which newly discovered matches will be appended
+    :param max_depth: recursion limit, not counting the subpath segments
+    :param depth: current depth, used when the function calls itself recursively
+    :return:
+    """
+#    console.print(f"Checking for {str(subpath)} under {str(path)} at depth {depth} of {max_depth}...")
+    if (path / subpath).is_dir():
+        if found_dirs is None:
+            raise(ValueError("Return list found_dirs must be created by caller."))
+        else:
+            found_dirs.append(path)
+#        console.print(f"Found match number {len(found_dirs)} under {str(path)}")
+    else:
+        # Iterate subdirectories only if the current level is not an
+        # engine installation, and if we are not yet at max depth.
+        if depth < max_depth:
+            for subdir in path.iterdir():
+                if (subdir.is_dir()):
+                    path_search_subpath(subdir, subpath, found_dirs, max_depth=max_depth, depth=depth+1)
+
+def path_search_subpath_list(paths: list[Path], subpath: PurePath, found_dirs: list[Path], *, max_depth: int = 3):
+    """
+    Calls path_search_subpath() for each Path in the list, and appends the combined results to found_dirs.
+    For parameter details see path_search_subpath().
+
+    :param paths: list of parent Path objects under which to search, each search being independent with
+    respect to recursion depth
+    :return:
+    """
+    for path in paths:
+        path_search_subpath(path, subpath, found_dirs, max_depth=max_depth)
+
 
 class YAMLChainMap(ChainMap):
     """
