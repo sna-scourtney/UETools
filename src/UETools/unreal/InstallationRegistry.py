@@ -1,24 +1,46 @@
 from __future__ import annotations
 
+import rich
+console = rich.get_console()
+
 import json
 from abc import ABC, abstractmethod
 from configparser import ConfigParser
 from dataclasses import dataclass
-from pathlib import Path
+from pathlib import Path, PurePath
 import platform
 
 from UETools.unreal.UnrealPlatform import UnrealPlatform, UEConfigSource
+from UETools.framework import path_search_subpath_list
 
 
-@dataclass
+@dataclass(init=False)
 class EngineLocation:
     """
     A single Unreal Engine installation: its version string and root directory.
     Version strings follow major.minor.patch convention (e.g. "5.7.4");
     patch defaults to 0 when absent from the registry entry.
     """
-    version: str
+    version: str | None
     root: Path
+
+    def __init__(self, root: Path, *,
+                version: str | None = None,
+                 major: int | None = None,
+                 minor: int | None = None,
+                 patch: int | None = None):
+        if root is None or not root.is_dir():
+            raise ValueError(f"Invalid root path {str(root)} (must be a directory).")
+        self.root = root
+        if version is None:
+            major : int = major if major is not None else 0
+            minor : int = minor if minor is not None else 0
+            patch : int = patch if patch is not None else 0
+            self.version = f"{major}.{minor}.{patch}"
+            if self.version == "0.0.0":
+                self.version = EngineLocation.version_from_root(self.root)
+        else:
+            self.version = version
 
     @property
     def major(self) -> int:
@@ -33,10 +55,27 @@ class EngineLocation:
         parts = self.version.split('.')
         return int(parts[2]) if len(parts) > 2 else 0
 
+    @staticmethod
+    def version_from_root(root: Path) -> str | None:
+        """
+        Resolves the version string of a UE instance by reading
+        Engine/Build/Build.version from the installation root. Returns None
+        if the file is absent or malformed.
+        """
+        build_version = root / BUILD_VERSION_PATH
+        if not build_version.is_file():
+            return None
+        try:
+            data = json.loads(build_version.read_text())
+            return f"{data['MajorVersion']}.{data['MinorVersion']}.{data['PatchVersion']}"
+        except (KeyError, json.JSONDecodeError, OSError):
+            return None
 
-_BUILD_VERSION_PATH = Path("Engine") / "Build" / "Build.version"
-_SAVED_CONFIG_PATH  = Path("Saved") / "Config"
 
+BUILD_VERSION_PATH: PurePath = PurePath("Engine") / "Build" / "Build.version"
+SAVED_CONFIG_PATH: PurePath  = PurePath("Saved") / "Config"
+ENGINE_BINARIES_PATH: PurePath = PurePath("Engine") / "Binaries"
+_DEFAULT_RECURSE_DEPTH: int = 3
 
 class InstallationRegistry(ABC):
     """
@@ -119,7 +158,7 @@ class InstallationRegistry(ABC):
                 raise ValueError(
                     f"{source.name} is a per-version config source and requires "
                     f"an EngineLocation.")
-            path = (self.config_dir() / location.version / _SAVED_CONFIG_PATH
+            path = (self.config_dir() / location.version / SAVED_CONFIG_PATH
                     / self.editor_config_subdir() / source.filename)
         else:
             path = self.config_dir() / source.filename
@@ -143,21 +182,23 @@ class InstallationRegistry(ABC):
         ...
 
     @staticmethod
-    def _version_from_guid(root: Path) -> str | None:
+    def locate_engines_from_dirs(paths: list[Path], *,
+            max_depth: int = _DEFAULT_RECURSE_DEPTH,
+            bin_subpath: PurePath = ENGINE_BINARIES_PATH) -> list[EngineLocation]:
         """
-        Resolves a GUID-keyed registry entry to a version string by reading
-        Engine/Build/Build.version from the installation root. Returns None
-        if the file is absent or malformed.
-        """
-        build_version = root / _BUILD_VERSION_PATH
-        if not build_version.is_file():
-            return None
-        try:
-            data = json.loads(build_version.read_text())
-            return f"{data['MajorVersion']}.{data['MinorVersion']}.{data['PatchVersion']}"
-        except (KeyError, json.JSONDecodeError, OSError):
-            return None
+        This is an alternate way to locate UE installations, given a list of parent directories
+        under which to search. The preferred method to find engines is using Unreal's own
+        config file (see other methods in this class).
 
+        :param dirs: list of top-level paths under which to search recursively
+        :param max_depth: Maximum recursion depth, not counting the binary subpath
+        :param bin_subpath: Subdirectory to engine binaries under a valid root, used for search matching
+        :return: list (possibly empty) of EngineLocation objects
+        """
+        engines: list[Path] = []
+        path_search_subpath_list(paths, bin_subpath, engines, max_depth=max_depth)
+        engine_locations: list[EngineLocation] = [EngineLocation(engine) for engine in engines]
+        return engine_locations
 
 class InstallationRegistry_Linux(InstallationRegistry):
     """
@@ -195,7 +236,7 @@ class InstallationRegistry_Linux(InstallationRegistry):
             root = Path(value.strip())
             if key.startswith('{'):
                 # GUID key: source build registered without a version string.
-                version = self._version_from_guid(root)
+                version = self.version_from_root(root)
                 if version is None:
                     continue
             else:
