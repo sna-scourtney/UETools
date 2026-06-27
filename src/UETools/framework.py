@@ -46,6 +46,9 @@ def path_search_subpath(path: Path, subpath: PurePath, found_dirs: list[Path], *
     :param max_depth: recursion limit, not counting the subpath segments
     :param depth: current depth, used when the function calls itself recursively
     :return:
+    :raises PermissionError: if any directory encountered during the search is not readable.
+        Callers are responsible for catching this and applying whatever policy is appropriate
+        (skip, warn, or treat as fatal) given their context.
     """
 #    console.print(f"Checking for {str(subpath)} under {str(path)} at depth {depth} of {max_depth}...")
     if (path / subpath).is_dir():
@@ -70,6 +73,7 @@ def path_search_subpath_list(paths: list[Path], subpath: PurePath, found_dirs: l
     :param paths: list of parent Path objects under which to search, each search being independent with
     respect to recursion depth
     :return:
+    :raises PermissionError: propagated from path_search_subpath(); see that function's documentation.
     """
     for path in paths:
         path_search_subpath(path, subpath, found_dirs, max_depth=max_depth)
