@@ -40,6 +40,7 @@ def path_search_subpath(path: Path, subpath: PurePath, found_dirs: list[Path], *
     The Path.walk() function would have been a simpler approach, but it lacks the ability to limit
     recursion depth, which is important for this application because of the extremely deep path trees.
 
+
     :param path: parent Path under which search will be conducted
     :param subpath: a subpath whose existence under a search point indicates the parent is  match
     :param found_dirs: list of Path objects to which newly discovered matches will be appended
