@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from pathlib import Path, PurePath
 import platform
 
-from UETools.unreal.UnrealPlatform import UnrealPlatform, UEConfigSource
+from UETools.unreal.unreal_platform import UnrealPlatform, UEConfigSource
 from UETools.framework import path_search_subpath_list
 
 BUILD_VERSION_PATH: PurePath = PurePath("Engine") / "Build" / "Build.version"

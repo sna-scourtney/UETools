@@ -5,9 +5,9 @@ console = rich.get_console()
 
 from pathlib import Path
 
-from UETools.unreal.UnrealPlatform import UEConfigSource
-from UETools.unreal.InstallationRegistry import EngineLocation, InstallationRegistry
-from UETools.unreal.UnrealProject import UnrealProject
+from UETools.unreal.unreal_platform import UEConfigSource
+from UETools.unreal.install_registry import EngineLocation, InstallationRegistry
+from UETools.unreal.unreal_project import UnrealProject
 
 
 class UnrealConfiguration:
