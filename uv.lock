@@ -221,7 +221,7 @@ requires-dist = [
     { name = "click", specifier = ">=8.2.1" },
     { name = "click-shell", specifier = "~=2.1" },
     { name = "rich", specifier = ">=10.11.0" },
-    { name = "typer", specifier = "~=0.16.1" },
+    { name = "typer", specifier = "~=0.16.0" },
     { name = "typer-shell", specifier = ">=1.0.3" },
     { name = "yamlpath", specifier = ">=3.8.2" },
 ]

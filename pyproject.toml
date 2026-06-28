@@ -14,7 +14,7 @@ dependencies = [
     "click_shell ~=2.1",
     "yamlpath >=3.8.2",
     # GitHub repo: https://github.com/sna-scourtney/typer-shell.git
-    "typer_shell @ file:///home/scourtney/src/typer-shell.git/dist/typer_shell-0.2.0-py3-none-any.whl",
+    "typer_shell >= 1.0.3",
 ]
 
 [project.urls]
