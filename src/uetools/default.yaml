@@ -2,7 +2,7 @@
 
 ---
 
-# Default settings for UETools. These are overridden by matching settings
+# Default settings for uetools. These are overridden by matching settings
 # in user- or site-specific configuration files.
 
 # TODO: Most or all of the global section will be in the framework refactor.

@@ -10,8 +10,8 @@ from dataclasses import dataclass
 from pathlib import Path, PurePath
 import platform
 
-from UETools.unreal.unreal_platform import UnrealPlatform, UEConfigSource
-from UETools.framework import path_search_subpath_list
+from uetools.unreal.unreal_platform import UnrealPlatform, UEConfigSource
+from uetools.framework import path_search_subpath_list
 
 BUILD_VERSION_PATH: PurePath = PurePath("Engine") / "Build" / "Build.version"
 SAVED_CONFIG_PATH: PurePath  = PurePath("Saved") / "Config"

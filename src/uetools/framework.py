@@ -6,7 +6,7 @@
 This is an interim subset of functionality that will
 be refactored to the new application framework when
 it is ready. Nothing in this module should be specific
-to Unreal Engine or to UETools.
+to Unreal Engine or to uetools.
 
 The application code should, to the extent possible, rely
 on AppContext rather than directly interacting with other

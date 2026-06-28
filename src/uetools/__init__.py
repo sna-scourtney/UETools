@@ -15,8 +15,8 @@ from yamlpath.enums import PathSeparators
 from yamlpath.wrappers import ConsolePrinter
 from typing import Annotated
 
-from UETools.framework import AppContext, YAMLChainMap, path_search_subpath_list
-from UETools.unreal import InstallationRegistry, EngineLocation
+from uetools.framework import AppContext, YAMLChainMap, path_search_subpath_list
+from uetools.unreal import InstallationRegistry, EngineLocation
 
 #### SETUP CORE ####
 console = rich.console.Console()

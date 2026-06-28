@@ -1,5 +1,5 @@
 #!/usr/bin/env python
 
-from UETools import app
+from uetools import app
 if __name__ == "__main__":
     app()
