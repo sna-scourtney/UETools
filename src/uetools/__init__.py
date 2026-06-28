@@ -1,20 +1,22 @@
 #!/usr/bin/env python
 
-__version__ = "2025.09.05"
+__version__ = "2026.06.27"
 
 import os
 
 import rich
 import logging
 from logging.handlers import BufferingHandler
-from pathlib import Path
+from pathlib import Path, PurePath
 import typer
 from yamlpath import YAMLPath
 from yamlpath.commands.yaml_paths import get_search_term, search_for_paths
 from yamlpath.enums import PathSeparators
 from yamlpath.wrappers import ConsolePrinter
+from typing import Annotated
 
-from UETools.framework import AppContext, YAMLChainMap
+from uetools.framework import AppContext, YAMLChainMap, path_search_subpath_list
+from uetools.unreal import InstallationRegistry, EngineLocation
 
 #### SETUP CORE ####
 console = rich.console.Console()
@@ -42,16 +44,41 @@ def config(ctx: typer.Context):
     # for path in search_for_paths(console_printer, processor, yaml_data, search_term):
     #      console.print(path)
 
+# def path_search_subpath(path: Path, subpath: PurePath, found_dirs: list[Path], *, max_depth: int = 3, depth: int = 1):
+# #    console.print(f"Checking for {str(subpath)} under {str(path)} at depth {depth} of {max_depth}...")
+#     if (path / subpath).is_dir():
+#         if found_dirs is None:
+#             raise(ValueError("Return list found_dirs must be created by caller."))
+#         else:
+#             found_dirs.append(path)
+# #        console.print(f"Found match number {len(found_dirs)} under {str(path)}")
+#     else:
+#         # Iterate subdirectories only if the current level is not an
+#         # engine installation, and if we are not yet at max depth.
+#         if depth < max_depth:
+#             for subdir in path.iterdir():
+#                 if (subdir.is_dir()):
+#                     path_search_subpath(subdir, subpath, found_dirs, max_depth=max_depth, depth=depth+1)
+
 @app.command(help="List installed Unreal Engine versions")
-def engines(ctx: typer.Context):
+def engines(ctx: typer.Context, *,
+            max_depth: Annotated[int, typer.Option(help="Directory recursion limit (not counting the bin_subpath levels)")] = 3,
+            bin_subpath: Annotated[str, typer.Option(help="Binary path under engine install root, matched to detect the engine root")] = "Engine/Binaries"
+    ):
     app_ctx: AppContext = ctx.obj
     dirs = app_ctx.config.yaml_data.get("uetools", []).get("paths", []).get("engine", []).get("installed", [])
-    for dir in dirs:
-        console.print(f"Checking for engine installs under {dir}...")
-        path: Path = Path(dir)
-        for subdir in path.iterdir():
-            if (subdir / "Engine/Binaries").is_dir():
-                console.print(f"Found engine install at {subdir}")
+    engines: list[Path] = []
+#    engine_bin_subpath = PurePath(bin_subpath)
+    paths: list[Path] = [Path(dir) for dir in dirs]
+    console.print(f"Checking for engine installs under {", ".join(dirs)}...")
+#    path_search_subpath_list(paths, engine_bin_subpath, engines, max_depth=max_depth)
+    engine_locations: list[EngineLocation] = InstallationRegistry.locate_engines_from_dirs(paths, max_depth=max_depth)
+    if len(engine_locations) > 0:
+        console.print("Engine locations:")
+        for engine in engine_locations:
+            console.print(f"\t{str(engine.root)}\tVersion: {engine.version}")
+    else:
+        console.print("No engines found.")
 
 @app.command(help="List information about Unreal Engine projects")
 def projects(ctx: typer.Context,
