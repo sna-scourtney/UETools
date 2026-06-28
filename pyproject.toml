@@ -16,6 +16,9 @@ dependencies = [
     "typer_shell >= 1.0.3",
 ]
 
+[project.scripts]
+uetools = "uetools:app"
+
 [project.urls]
 Homepage = "https://github.com/sna-scourtney/UETools"
 Issues = "https://github.com/sna-scourtney/UETools/issues"
