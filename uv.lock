@@ -205,7 +205,7 @@ wheels = [
 
 [[package]]
 name = "uetools"
-version = "2025.7.23"
+version = "2026.6.28"
 source = { editable = "." }
 dependencies = [
     { name = "click" },

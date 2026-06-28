@@ -1,6 +1,6 @@
 [project]
-name = "UETools"
-version = "2025.07.23"
+name = "uetools"
+version = "2026.06.28"
 requires-python = ">=3.12"
 readme = "README.md"
 license = "BSD-3-Clause-Clear"
@@ -13,7 +13,6 @@ dependencies = [
     "rich >=10.11.0",
     "click_shell ~=2.1",
     "yamlpath >=3.8.2",
-    # GitHub repo: https://github.com/sna-scourtney/typer-shell.git
     "typer_shell >= 1.0.3",
 ]
 
@@ -30,7 +29,7 @@ python_console = []
 #dev = ["ipdb >=0.13.13"]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/UETools"]
+packages = ["src/uetools"]
 
 [build-system]
 requires = ["hatchling"]
