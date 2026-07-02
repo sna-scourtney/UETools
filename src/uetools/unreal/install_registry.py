@@ -11,7 +11,7 @@ from pathlib import Path, PurePath
 import platform
 
 from uetools.unreal.unreal_platform import UnrealPlatform, UEConfigSource
-from uetools.framework import path_search_subpath_list
+from pyshell.core.filesystem import path_search_subpath_list
 
 BUILD_VERSION_PATH: PurePath = PurePath("Engine") / "Build" / "Build.version"
 SAVED_CONFIG_PATH: PurePath  = PurePath("Saved") / "Config"
@@ -95,7 +95,7 @@ class InstallationRegistry(ABC):
     """
 
     def __init__(self):
-        self._locations: list[EngineLocation] = self._load()
+        self._locations: list[EngineLocation] = self._load_from_ini()
 
     @classmethod
     def for_host(cls) -> InstallationRegistry:
@@ -180,17 +180,17 @@ class InstallationRegistry(ABC):
         return parser.get(section, key, fallback=None)
 
     @abstractmethod
-    def _load(self) -> list[EngineLocation]:
+    def _load_from_ini(self) -> list[EngineLocation]:
         """
         Reads and parses the installation registry for this host, resolving
-        any GUID-keyed entries to real version strings.
+        any GUID-keyed entries to real version strings. This is the preferred method.
         """
         ...
 
     @staticmethod
-    def locate_engines_from_dirs(paths: list[Path], *,
-            max_depth: int = _DEFAULT_RECURSE_DEPTH,
-            bin_subpath: PurePath = ENGINE_BINARIES_PATH) -> list[EngineLocation]:
+    def _load_from_dir_scan(paths: list[Path], *,
+                            max_depth: int = _DEFAULT_RECURSE_DEPTH,
+                            bin_subpath: PurePath = ENGINE_BINARIES_PATH) -> list[EngineLocation]:
         """
         This is an alternate way to locate UE installations, given a list of parent directories
         under which to search. The preferred method to find engines is using Unreal's own
@@ -225,7 +225,7 @@ class InstallationRegistry_Linux(InstallationRegistry):
     def editor_config_subdir(cls) -> Path:
         return Path("LinuxEditor")
 
-    def _load(self) -> list[EngineLocation]:
+    def _load_from_ini(self) -> list[EngineLocation]:
         registry_path = self.config_dir() / UEConfigSource.INSTALLATIONS.filename
         if not registry_path.is_file():
             return []

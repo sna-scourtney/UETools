@@ -15,7 +15,8 @@ from yamlpath.enums import PathSeparators
 from yamlpath.wrappers import ConsolePrinter
 from typing import Annotated
 
-from uetools.framework import AppContext, YAMLChainMap, path_search_subpath_list
+from uetools.framework import AppContext, YAMLChainMap
+from pyshell.core.filesystem import path_search_subpath_list
 from uetools.unreal import InstallationRegistry, EngineLocation
 
 #### SETUP CORE ####
@@ -72,7 +73,7 @@ def engines(ctx: typer.Context, *,
     paths: list[Path] = [Path(dir) for dir in dirs]
     console.print(f"Checking for engine installs under {", ".join(dirs)}...")
 #    path_search_subpath_list(paths, engine_bin_subpath, engines, max_depth=max_depth)
-    engine_locations: list[EngineLocation] = InstallationRegistry.locate_engines_from_dirs(paths, max_depth=max_depth)
+    engine_locations: list[EngineLocation] = InstallationRegistry._load_from_dir_scan(paths, max_depth=max_depth)
     if len(engine_locations) > 0:
         console.print("Engine locations:")
         for engine in engine_locations:

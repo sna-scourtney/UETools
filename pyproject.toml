@@ -14,6 +14,7 @@ dependencies = [
     "click_shell ~=2.1",
     "yamlpath >=3.8.2",
     "typer_shell >= 1.0.3",
+    "pyshell",
 ]
 
 [project.scripts]
@@ -30,6 +31,9 @@ Documentation = "https://github.com/sna-scourtney/UETools/blob/main/docs/"
 python_console = []
 #python_console = ["ipython"]
 #dev = ["ipdb >=0.13.13"]
+
+[tool.uv.sources]
+pyshell = { workspace = true }
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/uetools"]
